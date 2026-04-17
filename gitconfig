@@ -1,0 +1,7 @@
+[user]
+	name = kwant-dbg
+	email = harshit2003sharma@gmail.com
+[push]
+	autoSetupRemote = true
+[credential]
+	helper = store

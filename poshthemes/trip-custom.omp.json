@@ -1,0 +1,90 @@
+{
+    "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+    "version": 2,
+    "final_space": true,
+    "console_title_template": "{{ .Folder }}",
+    "blocks": [
+        {
+            "type": "prompt",
+            "alignment": "left",
+            "segments": [
+                {
+                    "type": "os",
+                    "style": "plain",
+                    "foreground": "#89dceb",
+                    "template": "{{ .Icon }} "
+                },
+                {
+                    "type": "session",
+                    "style": "plain",
+                    "foreground": "#ff79c6",
+                    "template": "{{ .UserName }} "
+                },
+                {
+                    "type": "path",
+                    "style": "plain",
+                    "foreground": "#8be9fd",
+                    "properties": {
+                        "style": "full"
+                    },
+                    "template": "{{ .Path }} "
+                },
+                {
+                    "type": "git",
+                    "style": "plain",
+                    "foreground": "#50fa7b",
+                    "properties": {
+                        "fetch_status": true
+                    },
+                    "template": "git:{{ .HEAD }}{{ if .Working.Changed }}*{{ end }} "
+                },
+                {
+                    "type": "go",
+                    "style": "plain",
+                    "foreground": "#00acd7",
+                    "template": "go:{{ .Full }} "
+                },
+                {
+                    "type": "docker",
+                    "style": "plain",
+                    "foreground": "#2496ed",
+                    "template": "docker:{{ .Context }} "
+                },
+                {
+                    "type": "kubectl",
+                    "style": "plain",
+                    "foreground": "#326ce5",
+                    "template": "{{ if .Env.K8S_ACTIVE }}󱃾 {{ .Context }}{{ if .Namespace }}:{{ .Namespace }}{{ end }} {{ end }}"
+                }
+            ]
+        },
+		{
+            "type": "prompt",
+            "alignment": "right",
+            "segments": [
+                {
+                    "type": "executiontime",
+                    "style": "plain",
+                    "foreground": "#f9e2af",
+                    "properties": {
+                        "threshold": 500
+                    },
+                    "template": "{{ mulf .Ms 0.001 | printf \"%.1f\" }}s"
+                }
+            ]
+        },
+        {
+            "type": "prompt",
+            "alignment": "left",
+            "newline": true,
+            "segments": [
+                {
+                    "type": "text",
+                    "style": "plain",
+                    "foreground": "#ff79c6",
+                    "template": "❯ "
+                }
+            ]
+        }
+    ]
+}

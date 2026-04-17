@@ -1,0 +1,9 @@
+# Never commit secrets
+.zshrc.local
+*.local
+*.pem
+*.key
+id_ed25519
+id_ed25519_personal
+.env
+credentials
