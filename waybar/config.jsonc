@@ -1,0 +1,148 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 28,
+    "spacing": 0,
+    "margin-top": 0,
+    "margin-left": 4,
+    "margin-right": 4,
+    "exclusive": true,
+
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "clock",
+        "custom/weather"
+    ],
+    "modules-right": [
+        "cpu",
+        "temperature",
+        "pulseaudio",
+        "backlight",
+        "network",
+        "tray",
+        "custom/power"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "10": "10"
+        },
+        "on-click": "activate",
+        "sort-by-number": true,
+        "active-only": false
+    },
+
+    "hyprland/window": {
+        "max-length": 36,
+        "separate-outputs": true,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": "󰈹 $1",
+            "(.*) - kitty": " $1",
+            "(.*) — Dolphin": " $1",
+            "(.*) - nvim": "󱃖 $1",
+            "^$": "󰇄 Desktop"
+        }
+    },
+
+    "clock": {
+        "format": "󰅐 {:%I:%M %p · %a %d %b}",
+        "format-alt": "󰃰 {:%A, %B %d %Y · %I:%M:%S %p}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "month",
+            "on-scroll": 1,
+            "format": {
+                "months": "<span color='#e0e0e0'><b>{}</b></span>",
+                "days": "<span color='#888888'>{}</span>",
+                "weeks": "<span color='#555555'>W{}</span>",
+                "weekdays": "<span color='#aaaaaa'><b>{}</b></span>",
+                "today": "<span color='#ffffff'><b><u>{}</u></b></span>"
+            }
+        },
+        "interval": 1
+    },
+
+    "cpu": {
+        "interval": 2,
+        "format": "󰻠 {usage}%",
+        "format-alt": "󰻠 {avg_frequency} GHz",
+        "tooltip": true
+    },
+
+    "temperature": {
+        "critical-threshold": 85,
+        "interval": 5,
+        "format": " {temperatureC}°C",
+        "format-critical": " {temperatureC}°C",
+        "tooltip": true
+    },
+
+    "custom/weather": {
+        "exec": "~/.config/waybar/weather.sh",
+        "return-type": "json",
+        "interval": 900,
+        "format": "{}",
+        "tooltip": true
+    },
+
+    "tray": {
+        "icon-size": 15,
+        "spacing": 6
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "󰂰 {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "headphone": "󰋋",
+            "hands-free": "󰋌",
+            "headset": "󰋎",
+            "phone": "󰏲",
+            "portable": "󰏲",
+            "car": "󰄋",
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-",
+        "tooltip": true
+    },
+
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃚", "󰃛", "󰃜", "󰃝", "󰃞", "󰃟", "󰃠"],
+        "on-scroll-up": "brightnessctl -e4 -n2 set 2%+",
+        "on-scroll-down": "brightnessctl -e4 -n2 set 2%-",
+        "tooltip": false
+    },
+
+    "network": {
+        "format-wifi": "󰤨 {signalStrength}%",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-linked": "󰈀 {ifname}",
+        "format-disconnected": "󰤭",
+        "tooltip-format-wifi": "{essid}\n{signalStrength}% · {frequency} MHz\n{ipaddr}/{cidr}",
+        "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "custom/power": {
+        "format": "󰐥",
+        "on-click": "hyprctl dispatch exit",
+        "tooltip": false
+    }
+}

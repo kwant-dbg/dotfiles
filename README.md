@@ -1,52 +1,69 @@
 # dotfiles
 
-Personal dotfiles for zsh + Neovim (LazyVim) + tmux setup.
-Targets **Arch Linux (Hyprland/Wayland)** — also works on WSL Ubuntu with minor tweaks.
+Personal Linux dotfiles centered on a Hyprland desktop, `zsh`, `tmux`, and Neovim.
 
-## Quick Install
+## Included
+
+| Path | Destination |
+|---|---|
+| `zshrc` | `~/.zshrc` |
+| `tmux.conf` | `~/.tmux.conf` |
+| `gitconfig` | `~/.gitconfig` |
+| `nvim/` | `~/.config/nvim/` |
+| `hypr/` | `~/.config/hypr/` |
+| `waybar/` | `~/.config/waybar/` |
+| `kitty/` | `~/.config/kitty/` |
+| `atuin/` | `~/.config/atuin/` |
+| `poshthemes/` | `~/.poshthemes/` |
+
+## Quick install
 
 ```bash
 git clone https://github.com/<your-username>/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-chmod +x install.sh
 ./install.sh
 ```
 
-The script will:
-- Symlink all configs into place (backs up existing files as `.bak`)
-- Install packages via `pacman` + `yay` (Arch) or `apt` (WSL)
-- Clone zsh plugins, tmux-resurrect
-- Install nvm, bun, atuin
+`install.sh` will:
 
-## What's Included
+- symlink tracked configs into `$HOME`
+- back up replaced real files with a timestamped `.bak.<timestamp>` suffix
+- install core packages on Arch or WSL
+- clone shell and tmux plugins
+- install `nvm`, `bun`, and `atuin` if missing
 
-| File/Dir | Destination | Notes |
-|---|---|---|
-| `zshrc` | `~/.zshrc` | zsh config, aliases, plugins |
-| `tmux.conf` | `~/.tmux.conf` | Wayland clipboard (`wl-copy`) |
-| `gitconfig` | `~/.gitconfig` | Personal git identity |
-| `nvim/` | `~/.config/nvim/` | LazyVim config + locked plugins |
-| `poshthemes/` | `~/.poshthemes/` | oh-my-posh prompt theme |
+## Arch desktop coverage
 
-## Secrets / Machine-Specific Config
+The Arch path now includes packages needed for the tracked desktop config:
 
-Put machine-specific env vars in `~/.zshrc.local` — this file is **not tracked in git**:
+- Hyprland, Hypridle, Hyprlock, Hyprpaper
+- Waybar, Wofi, Dunst
+- Kitty, tmux, Neovim
+- clipboard, screenshot, audio, brightness, and network helpers
+
+## Machine-local overrides
+
+Keep secrets and machine-specific values in `~/.zshrc.local`:
 
 ```bash
-# ~/.zshrc.local
 export MY_API_KEY="..."
+export WAYBAR_WEATHER_LAT="31.6138"
+export WAYBAR_WEATHER_LON="76.3579"
+export WAYBAR_WEATHER_LABEL="Bangana, Himachal Pradesh"
 ```
 
-## WSL Notes
+`waybar/weather.sh` reads those weather variables if you want a different location.
 
-`tmux.conf` uses `wl-copy` (Wayland). On WSL, change it to `clip.exe`:
+## Wallpaper note
+
+The Hyprland config expects an optional wallpaper at:
+
+```bash
+~/.config/hypr/wallpaper.jpg
 ```
-bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "clip.exe"
-```
 
-## Stack
+If it is missing, startup continues without wallpaper assignment.
 
-- **Shell**: zsh + oh-my-posh + zsh-autosuggestions + zsh-syntax-highlighting + atuin + zoxide
-- **Editor**: Neovim (LazyVim) with telescope, lualine, noice, org-roam
-- **Terminal**: Kitty + tmux (mellow dark theme)
-- **CLI tools**: bat, eza, yazi, fzf, ripgrep, fd
+## WSL note
+
+The repo still links shell, tmux, git, Neovim, Kitty, and Atuin on WSL, but the Hyprland and Waybar pieces are Linux desktop specific.

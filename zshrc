@@ -3,10 +3,17 @@
 # Interactive check
 [[ $- != *i* ]] && return
 
+# Helper
+has() {
+    command -v "$1" >/dev/null 2>&1
+}
+
 # ─────────────────────────────────────────────────────────────
 # Environment & Path
 # ─────────────────────────────────────────────────────────────
-eval "$(zoxide init zsh --cmd cd)"
+if has zoxide; then
+    eval "$(zoxide init zsh --cmd cd)"
+fi
 
 export PATH="$HOME/.local/bin:$HOME/.opencode/bin:/snap/bin:$PATH"
 export PATH="$HOME/.config/emacs/bin:$PATH"
@@ -40,14 +47,18 @@ autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
-source $HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
-source $HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2>/dev/null
+[[ -f "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # ─────────────────────────────────────────────────────────────
 # Aliases
 # ─────────────────────────────────────────────────────────────
-alias ls='eza --icons --group-directories-first'
-alias cat='bat --paging=never'
+if has eza; then
+    alias ls='eza --icons --group-directories-first'
+fi
+if has bat; then
+    alias cat='bat --paging=never'
+fi
 alias grep='grep --color=auto'
 alias c='clear'
 alias ..='cd ..'
@@ -83,10 +94,16 @@ function npx()  { nvm >/dev/null; command npx "$@"; }
 # ─────────────────────────────────────────────────────────────
 # Prompt & External Tools
 # ─────────────────────────────────────────────────────────────
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/trip-custom.omp.json)"
+if has oh-my-posh && [[ -f "$HOME/.poshthemes/trip-custom.omp.json" ]]; then
+    eval "$(oh-my-posh init zsh --config ~/.poshthemes/trip-custom.omp.json)"
+fi
 
-. "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
+if [[ -f "$HOME/.atuin/bin/env" ]]; then
+    . "$HOME/.atuin/bin/env"
+fi
+if has atuin; then
+    eval "$(atuin init zsh)"
+fi
 
 # Key Bindings
 bindkey '^[[A' history-search-backward

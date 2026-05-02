@@ -1,0 +1,8 @@
+auto_sync = true
+sync_frequency = "10m"
+search_mode = "fuzzy"
+filter_mode = "workspace"
+style = "compact"
+inline_height = 18
+show_preview = true
+enter_accept = true

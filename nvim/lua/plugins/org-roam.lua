@@ -1,12 +1,14 @@
 return {
   {
     "nvim-orgmode/orgmode",
-    tag = "0.7.0",
     event = "VeryLazy",
+    ft = "org",
     config = function()
+      local org_roam = require("config.org_roam")
+
       require("orgmode").setup({
-        org_agenda_files = { "~/notes/roam/**/*.org" },
-        org_default_notes_file = "~/notes/roam/inbox.org",
+        org_agenda_files = org_roam.agenda_files(),
+        org_default_notes_file = org_roam.default_notes_file(),
         org_hide_emphasis_markers = true,
         org_hide_leading_stars = true,
         org_startup_indented = true,
@@ -57,7 +59,6 @@ return {
   },
   {
     "akinsho/org-bullets.nvim",
-    event = "VeryLazy",
     ft = "org",
     config = function()
       require("org-bullets").setup({
@@ -92,14 +93,13 @@ return {
   },
   {
     "chipsenkbeil/org-roam.nvim",
-    tag = "0.2.0",
     event = "VeryLazy",
     dependencies = { "nvim-orgmode/orgmode" },
     config = function()
       local org_roam = require("config.org_roam")
 
       require("org-roam").setup({
-        directory = "~/notes/roam",
+        directory = org_roam.roam_dir(),
         bindings = false,
         extensions = {
           dailies = {
@@ -112,18 +112,72 @@ return {
             description = "Permanent note",
             template = "\n\n* Related Notes\n- %?",
             target = "permanent/%[slug].org",
-            header = "#+title: ${title}\n#+filetags: :permanent:\n#+date: %<%Y-%m-%d>\n",
+            header = "#+TITLE: ${title}\n#+FILETAGS: :permanent:\n#+DATE: %<%Y-%m-%d>\n",
           },
           m = {
             description = "Meeting",
             template = "* Notes\n%?\n\n* Action Items\n- [ ] \n\n* Related\n- ",
             target = "meetings/%<%Y-%m-%d> - %[slug].org",
-            header = "#+title: ${title}\n#+filetags: :meeting:\n#+date: %<%Y-%m-%d>\n",
+            header = "#+TITLE: ${title}\n#+FILETAGS: :meeting:\n#+DATE: %<%Y-%m-%d>\n",
           },
         },
       })
 
       local roam = require("org-roam")
+      local roam_utils = require("org-roam.utils")
+      local original_node_under_cursor = roam_utils.node_under_cursor
+      local original_link_under_cursor = roam_utils.link_under_cursor
+
+      local function is_safe_org_buffer(bufnr)
+        if not bufnr or bufnr == 0 or not vim.api.nvim_buf_is_valid(bufnr) then
+          return false
+        end
+
+        if vim.bo[bufnr].filetype ~= "org" then
+          return false
+        end
+
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        if name == "" then
+          return false
+        end
+
+        local buftype = vim.bo[bufnr].buftype
+        return buftype == "" or buftype == "acwrite"
+      end
+
+      roam_utils.node_under_cursor = function(cb, opts)
+        opts = opts or {}
+        local bufnr = vim.api.nvim_win_get_buf(opts.win or 0)
+        if not is_safe_org_buffer(bufnr) then
+          vim.schedule(function()
+            cb(nil)
+          end)
+          return
+        end
+
+        local ok, err = pcall(original_node_under_cursor, cb, opts)
+        if not ok then
+          vim.schedule(function()
+            vim.notify(("org-roam node lookup skipped: %s"):format(err), vim.log.levels.DEBUG)
+            cb(nil)
+          end)
+        end
+      end
+
+      roam_utils.link_under_cursor = function(opts)
+        opts = opts or {}
+        local bufnr = vim.api.nvim_win_get_buf(opts.win or 0)
+        if not is_safe_org_buffer(bufnr) then
+          return nil
+        end
+
+        local ok, result = pcall(original_link_under_cursor, opts)
+        if ok then
+          return result
+        end
+        return nil
+      end
 
       require("which-key").add({ { "<leader>r", group = "org-roam" } })
 
@@ -134,22 +188,10 @@ return {
       vim.keymap.set("n", "<leader>rd", function() org_roam.open_today_daily_note() end, { desc = "Open today's note" })
 
       vim.api.nvim_create_autocmd("BufWritePost", {
-        group = vim.api.nvim_create_augroup("trip_org_roam_sync", { clear = true }),
+        group = vim.api.nvim_create_augroup("trip_org_roam_emacs_sync", { clear = true }),
         pattern = "*.org",
         callback = function()
-          local path = vim.fn.expand("%:p")
-
-          local ok, roam = pcall(require, "org-roam")
-          if ok then
-            pcall(function()
-              roam.database:load_file({ path = path, force = true }):wait()
-            end)
-          end
-
-          vim.fn.jobstart({
-            "emacsclient", "--no-wait", "--eval",
-            string.format('(progn (org-roam-db-update-file "%s") (org-roam-ui--send-graphdata))', path),
-          }, { detach = true })
+          org_roam.sync_with_emacs(vim.fn.expand("<afile>:p"))
         end,
       })
 
