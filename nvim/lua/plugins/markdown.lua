@@ -20,20 +20,22 @@ return {
     },
   },
   config = function(_, opts)
+    local palette = require("config.palette")
+
     require("render-markdown").setup(opts)
     -- Kanagawa Dragon: heading colors per level
-    vim.api.nvim_set_hl(0, "RenderMarkdownH1", { fg = "#c4746e", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH2", { fg = "#c4b28a", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH3", { fg = "#8a9a7b", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH4", { fg = "#8ea4a2", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH5", { fg = "#8ba4b0", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH6", { fg = "#a292a3", bold = true })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH1Bg", { bg = "#261e1e" })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH2Bg", { bg = "#252018" })
-    vim.api.nvim_set_hl(0, "@markup.strong", { fg = "#e7d3b0", bold = true })
-    vim.api.nvim_set_hl(0, "@markup.italic", { fg = "#b3b8c4", italic = true })
-    vim.api.nvim_set_hl(0, "@markup.raw.inline", { fg = "#c4746e" })
-    vim.api.nvim_set_hl(0, "@markup.link", { fg = "#8ba4b0", underline = true, sp = "#8ba4b0" })
-    vim.api.nvim_set_hl(0, "@markup.link.url", { fg = "#8ea4a2", underline = true, sp = "#8ea4a2" })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH1", { fg = palette.red_soft, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH2", { fg = palette.yellow_muted, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH3", { fg = palette.green_muted, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH4", { fg = palette.cyan_soft, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH5", { fg = palette.cyan_muted, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH6", { fg = palette.purple_soft, bold = true })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH1Bg", { bg = palette.bg_markdown_h1 })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH2Bg", { bg = palette.bg_markdown_h2 })
+    vim.api.nvim_set_hl(0, "@markup.strong", { fg = palette.fg_markdown_bold, bold = true })
+    vim.api.nvim_set_hl(0, "@markup.italic", { fg = palette.fg_markdown_italic, italic = true })
+    vim.api.nvim_set_hl(0, "@markup.raw.inline", { fg = palette.red_soft })
+    vim.api.nvim_set_hl(0, "@markup.link", { fg = palette.cyan_muted, underline = true, sp = palette.cyan_muted })
+    vim.api.nvim_set_hl(0, "@markup.link.url", { fg = palette.cyan_soft, underline = true, sp = palette.cyan_soft })
   end,
 }

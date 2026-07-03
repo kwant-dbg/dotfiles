@@ -5,10 +5,6 @@ return {
       -- C/C++ formatting
       c = { "clang_format" },
       cpp = { "clang_format" },
-
-      -- Go formatting with import management
-      go = { "goimports", "gofmt" },
-
     },
   },
 }
