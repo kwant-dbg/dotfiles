@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cache_file="${HOME}/.claude/litellm-key"
+lock_file="${HOME}/.claude/.litellm-key-helper.lock"
+real_helper="${HOME}/.local/bin/yum-litellm-key-helper"
+
+# Keep Claude startup fast when the helper has already cached a valid, fresh token.
+# TTL matches CLAUDE_CODE_API_KEY_HELPER_TTL_MS in settings.json (6 hours).
+ttl_seconds=21600
+if [[ -s "$cache_file" ]]; then
+  file_age=$(( $(date +%s) - $(stat -c %Y "$cache_file") ))
+  if [[ $file_age -lt $ttl_seconds ]]; then
+    cat "$cache_file"
+    exit 0
+  fi
+  rm -f "$cache_file"
+fi
+
+exec 9>"$lock_file"
+if ! flock -w 2 9; then
+  echo "yum-litellm-key-helper is already running; finish the existing SSO flow or close the stale Claude session." >&2
+  exit 1
+fi
+
+if [[ -s "$cache_file" ]]; then
+  file_age=$(( $(date +%s) - $(stat -c %Y "$cache_file") ))
+  if [[ $file_age -lt $ttl_seconds ]]; then
+    cat "$cache_file"
+    exit 0
+  fi
+  rm -f "$cache_file"
+fi
+
+exec "$real_helper"

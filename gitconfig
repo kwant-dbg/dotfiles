@@ -3,5 +3,9 @@
 	email = harshit2003sharma@gmail.com
 [push]
 	autoSetupRemote = true
+[includeif "gitdir:~/yum/yumbrands/"]
+	path = ~/.gitconfig-yumbrands
 [credential]
 	helper = store
+[core]
+	excludesFile = ~/.gitignore_global

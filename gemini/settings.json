@@ -1,0 +1,32 @@
+{
+  "hasSeenIdeIntegrationNudge": true,
+  "ide": {
+    "enabled": true
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "ui": {
+    "useAlternateBuffer": true,
+    "hideBanner": true,
+    "showMemoryUsage": true,
+    "showModelInfoInChat": true,
+    "showStatusInTitle": true,
+    "footer": {
+      "hideContextPercentage": false
+    },
+    "hideWindowTitle": false,
+    "theme": "ANSI"
+  },
+  "general": {
+    "previewFeatures": true,
+    "sessionRetention": {
+      "warningAcknowledged": true,
+      "enabled": true,
+      "maxAge": "30d"
+    },
+    "vimMode": false
+  }
+}

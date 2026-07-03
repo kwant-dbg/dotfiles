@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ -n "${NVM_BIN:-}" ] && [ -x "${NVM_BIN}/codex" ]; then
+    exec "${NVM_BIN}/codex" "$@"
+fi
+
+nvm_root="${NVM_DIR:-$HOME/.nvm}"
+shopt -s nullglob
+candidates=("$nvm_root"/versions/node/*/bin/codex)
+shopt -u nullglob
+
+if ((${#candidates[@]})); then
+    latest_codex="$(printf '%s\n' "${candidates[@]}" | sort -V | tail -n 1)"
+    exec "$latest_codex" "$@"
+fi
+
+printf 'codex: unable to find an installed Codex binary under %s\n' "$nvm_root" >&2
+exit 127

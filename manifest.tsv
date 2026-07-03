@@ -1,0 +1,70 @@
+# repository source<TAB>home-relative target<TAB>mode (link is default; copy/template are supported)
+bashrc	.bashrc
+bash_logout	.bash_logout
+profile	.profile
+zshrc	.zshrc
+tmux.conf	.tmux.conf
+gitconfig	.gitconfig
+gitconfig-yumbrands	.gitconfig-yumbrands
+gitignore_global	.gitignore_global
+clang-format	.clang-format
+gtkrc-2.0	.gtkrc-2.0
+bin/codex	.local/bin/codex
+bin/dev	.local/bin/dev
+bin/img	.local/bin/img
+bin/yum-litellm-key-helper-robust	.local/bin/yum-litellm-key-helper-robust
+ssh/config	.ssh/config
+docker/config.json	.docker/config.json	copy
+windsurf/mcp_config.json	.codeium/windsurf/mcp_config.json	template
+windsurf/workflows	.codeium/windsurf/windsurf/workflows
+copilot/mcp-config.json	.copilot/mcp-config.json	template
+poshthemes	.poshthemes
+nvim	.config/nvim
+config/atuin/config.toml	.config/atuin/config.toml
+config/bat	.config/bat
+config/btop/btop.conf	.config/btop/btop.conf
+config/ccsession/config.toml	.config/ccsession/config.toml
+config/ccstatusline/settings.json	.config/ccstatusline/settings.json
+config/doom	.config/doom
+config/envman/load.sh	.config/envman/load.sh
+config/fastfetch	.config/fastfetch
+config/fish/conf.d	.config/fish/conf.d
+config/git/ignore	.config/git/ignore
+config/gtk-3.0/settings.ini	.config/gtk-3.0/settings.ini
+config/gtk-4.0/settings.ini	.config/gtk-4.0/settings.ini
+config/helm/repositories.yaml	.config/helm/repositories.yaml	copy
+config/k9s/aliases.yaml	.config/k9s/aliases.yaml
+config/k9s/config.yaml	.config/k9s/config.yaml	template
+config/mimeapps.list	.config/mimeapps.list
+config/micro/bindings.json	.config/micro/bindings.json
+config/micro/settings.json	.config/micro/settings.json
+config/neofetch/config.conf	.config/neofetch/config.conf
+config/opencode/.gitignore	.config/opencode/.gitignore
+config/opencode/oh-my-openagent.json.disabled	.config/opencode/oh-my-openagent.json.disabled
+config/opencode/opencode.json	.config/opencode/opencode.json
+config/opencode/plugins	.config/opencode/plugins
+config/opencode/tui.json	.config/opencode/tui.json
+config/tealdeer/config.toml	.config/tealdeer/config.toml
+config/Code/User/keybindings.json	.config/Code/User/keybindings.json
+config/Code/User/settings.json	.config/Code/User/settings.json
+config/Sqlectron/sqlectron.json	.config/Sqlectron/sqlectron.json	copy
+config/glab-cli/aliases.yml	.config/glab-cli/aliases.yml
+opencode-home/.gitignore	.opencode/.gitignore
+opencode-home/opencode.json	.opencode/opencode.json
+opencode-home/tui.json	.opencode/tui.json
+agents/.skill-lock.json	.agents/.skill-lock.json
+agents/skills	.agents/skills
+claude/CLAUDE.md	.claude/CLAUDE.md
+claude/keybindings.json	.claude/keybindings.json
+claude/settings.json	.claude/settings.json	template
+claude/statusline.sh	.claude/statusline.sh
+claude/skills-lock.json	.claude/skills-lock.json
+claude/skills	.claude/skills
+claude/dot-agents/skills	.claude/.agents/skills
+codex/AGENTS.md	.codex/AGENTS.md
+codex/config.toml	.codex/config.toml	template
+codex/hooks.json	.codex/hooks.json
+codex/rules	.codex/rules
+gemini/GEMINI.md	.gemini/GEMINI.md
+gemini/settings.json	.gemini/settings.json
+gemini/trustedFolders.json	.gemini/trustedFolders.json	template

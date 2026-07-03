@@ -1,0 +1,81 @@
+{
+  "apiKeyHelper": "/home/trip/.local/bin/yum-litellm-key-helper-robust",
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://litellm.shd.yumconnect.dev",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "haiku (bedrock)",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "sonnet (bedrock)",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "opus (bedrock)",
+    "CLAUDE_CODE_USE_BEDROCK": "0",
+    "CLAUDE_CODE_API_KEY_HELPER_TTL_MS": "21600000"
+  },
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Bash(export *)",
+      "Bash(echo *)",
+      "Bash(nvim *)",
+      "Bash(go *)",
+      "Bash(python3 *)",
+      "Bash(codex *)",
+      "Bash(claude-code *)",
+      "Bash(/home/trip/.claude/statusline.sh)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:sw.kovidgoyal.net)",
+      "WebFetch(domain:www.gnu.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:linux.die.net)",
+      "WebFetch(domain:sixel.saitoha.jp)",
+      "WebFetch(domain:orgmode.org)",
+      "WebFetch(domain:nvim-orgmode.github.io)"
+    ],
+    "defaultMode": "default"
+  },
+  "availableModels": [
+    "haiku (bedrock)",
+    "sonnet (bedrock)",
+    "opus (bedrock)"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); if ! printf '%s' \"$cmd\" | grep -qE '(\\||&&|;)\\s*(bash|sh|zsh|fish|python3?|node|perl|ruby|php)\\b'; then printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\"}}'; fi",
+            "if": "Bash(curl *)"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/home/trip/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": false,
+    "caveman@caveman": false
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "editorMode": "vim",
+  "preferredNotifChannel": "terminal_bell",
+  "autoApprove": {
+    "bash": false,
+    "read": true,
+    "glob": true,
+    "grep": true
+  }
+}

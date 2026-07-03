@@ -1,0 +1,147 @@
+approvals_reviewer = "user"
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+
+[features]
+external_migration = true
+memories = true
+prevent_idle_sleep = true
+
+[notice]
+fast_default_opt_out = true
+
+[notice.external_config_migration_prompts]
+home_last_prompted_at = 1781111761
+
+[notice.external_config_migration_prompts.project_last_prompted_at]
+"/home/trip/yum/projects/mergelens" = 1777998040
+"/home/trip/yum/kepler-datadog" = 1778409606
+"/home/trip/yum/kepler-datadog/mergelens" = 1779802259
+"/home/trip/yum/yumbrands/yumdev/yumsre-infraops/incident-management/tools/monitor-review-tracker" = 1781111761
+
+[notice.model_migrations]
+"gpt-5.1-codex-mini" = "gpt-5.4"
+"gpt-5.3-codex" = "gpt-5.4"
+"gpt-5.4" = "gpt-5.5"
+
+[plugins."canva@openai-curated"]
+enabled = true
+
+[projects."/home/trip"]
+trust_level = "trusted"
+
+[projects."/home/trip/.config/nvim"]
+trust_level = "trusted"
+
+[projects."/home/trip/dev"]
+trust_level = "trusted"
+
+[projects."/home/trip/dev/saa"]
+trust_level = "trusted"
+
+[projects."/home/trip/kernel-dev"]
+trust_level = "trusted"
+
+[projects."/home/trip/research"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/projects/mergelens"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/kepler-datadog"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/projects/cert-manager"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/yumsre-infraops/operations-platform"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yc-data-adv-analytics/operations"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/kepler-datadog/mergelens"]
+trust_level = "trusted"
+
+[projects."/home/trip/dev/org-roam-ui.nvim"]
+trust_level = "trusted"
+
+[projects."/home/trip/dev/web"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/yumsre-infraops/incident-management/tools/monitor-review-tracker"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/projects/cert-acm-sync"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/projects/cert-manager-sync"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/yumsre-infraops/incident-management/byte/tools/orbit-byte-im"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/yumsre-infraops/operations-infra"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/platform-engineering/gre-graph"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/yumdev/yumsre-infraops/incident-management/byte/tools/4bit-clone"]
+trust_level = "trusted"
+
+[projects."/home/trip/yum/yumbrands/gre/strategy-specs"]
+trust_level = "trusted"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+ANTHROPIC_MODEL = "us.anthropic.claude-sonnet-4-6"
+AWS_PROFILE = "bedrock"
+AWS_REGION = "us-east-1"
+CLAUDE_CODE_USE_BEDROCK = "1"
+ANTHROPIC_BASE_URL = "https://litellm.shd.yumconnect.dev"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "haiku (bedrock)"
+ANTHROPIC_DEFAULT_SONNET_MODEL = "sonnet (bedrock)"
+ANTHROPIC_DEFAULT_OPUS_MODEL = "opus (bedrock)"
+CLAUDE_CODE_API_KEY_HELPER_TTL_MS = "21600000"
+
+[tui]
+status_line = [
+    "model-with-reasoning",
+    "context-remaining",
+    "current-dir",
+    "five-hour-limit",
+    "weekly-limit",
+    "used-tokens",
+    "run-state",
+]
+vim_mode_default = true
+status_line_use_colors = true
+pet = "rocky"
+theme = "dracula"
+session_picker_view = "dense"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[hooks.state."/home/trip/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:f9177b380fa0c5c2b4bd5b2084b7e58e4730a23e23fbab93ada4b0494b02f5ca"
+
+[hooks.state."/home/trip/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:2062c864c5235a8235f11beaa253235104353f9e5e96975f057c6c1abf5303c1"
+enabled = false
+
+[mcp_servers.datadogUS]
+url = "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp"
+
+[mcp_servers.datadogEU]
+url = "https://mcp.datadoghq.eu/api/unstable/mcp-server/mcp"

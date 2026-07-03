@@ -1,0 +1,19 @@
+# AI agent context files
+.claude/
+.cursor/
+.cursorrules
+.gemini/
+.kiro/
+.qoder/
+.windsurfrules
+.opencode.json
+.mcp.json
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+QODER.md
+
+# Code review graph MCP
+.code-review-graph/
+
+**/.claude/settings.local.json

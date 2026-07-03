@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+SESSION="dev"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+  tmux attach -t "$SESSION"
+  exit
+fi
+
+tmux new-session -d -s "$SESSION" -n nvim -x 220 -y 50
+tmux send-keys -t "$SESSION:nvim" "nvim" Enter
+
+tmux new-window -t "$SESSION" -n zsh
+
+tmux new-window -t "$SESSION" -n claude "claude; exec zsh"
+
+tmux new-window -t "$SESSION" -n codex "codex; exec zsh"
+
+tmux select-window -t "$SESSION:nvim"
+tmux attach -t "$SESSION"

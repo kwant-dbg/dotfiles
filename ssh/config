@@ -1,0 +1,11 @@
+# Personal GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_personal
+
+# Work GitLab (Yum)
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519

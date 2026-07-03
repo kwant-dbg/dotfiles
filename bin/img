@@ -1,0 +1,32 @@
+#!/bin/bash
+# Display images inline using iTerm2 protocol with proper vertical space
+if [ -z "$1" ]; then
+    echo "Usage: img <image-file>"
+    exit 1
+fi
+if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    exit 1
+fi
+
+# Get image height using ImageMagick
+img_h=$(identify -format "%h" "$1" 2>/dev/null)
+if [ -z "$img_h" ]; then
+    echo "Cannot read image dimensions (is imagemagick installed?)"
+    exit 1
+fi
+
+# Estimate terminal rows needed (~28px per cell row at font size 13)
+rows_needed=$(( (img_h + 27) / 28 ))
+
+# Pre-scroll: print blank lines, then move cursor back up
+printf '%0.s\n' $(seq 1 "$rows_needed")
+printf '\e[%dA' "$rows_needed"
+
+# Display image
+file_size=$(wc -c < "$1")
+b64_data=$(base64 -w0 < "$1")
+printf '\e]1337;File=inline=1;size=%d;preserveAspectRatio=1:%s\a' "$file_size" "$b64_data"
+
+# Move cursor below the image
+printf '\e[%dB\n' "$rows_needed"

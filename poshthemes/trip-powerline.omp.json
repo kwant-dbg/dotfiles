@@ -1,0 +1,112 @@
+{
+    "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+    "version": 2,
+    "final_space": true,
+    "console_title_template": "{{ .Folder }}",
+    "blocks": [
+        {
+            "type": "prompt",
+            "alignment": "left",
+            "segments": [
+                {
+                    "type": "os",
+                    "style": "diamond",
+                    "leading_diamond": "",
+                    "trailing_diamond": "",
+                    "background": "#bd93f9",
+                    "foreground": "#282a36",
+                    "template": " {{ .Icon }} "
+                },
+                {
+                    "type": "session",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#44475a",
+                    "foreground": "#ff79c6",
+                    "template": " {{ .UserName }} "
+                },
+                {
+                    "type": "path",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#6272a4",
+                    "foreground": "#f8f8f2",
+                    "properties": {
+                        "style": "full"
+                    },
+                    "template": "  {{ .Path }} "
+                },
+                {
+                    "type": "git",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#50fa7b",
+                    "background_templates": [
+                        "{{ if .Working.Changed }}#ffb86c{{ end }}",
+                        "{{ if gt .Ahead 0 }}#bd93f9{{ end }}"
+                    ],
+                    "foreground": "#282a36",
+                    "properties": {
+                        "fetch_status": true
+                    },
+                    "template": "  {{ .HEAD }}{{ if .Working.Changed }} *{{ end }}{{ if gt .Ahead 0 }} ↑{{ .Ahead }}{{ end }}{{ if gt .Behind 0 }} ↓{{ .Behind }}{{ end }} "
+                },
+                {
+                    "type": "go",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#00acd7",
+                    "foreground": "#f8f8f2",
+                    "template": "  {{ .Full }} "
+                },
+                {
+                    "type": "docker",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#2496ed",
+                    "foreground": "#f8f8f2",
+                    "template": "  {{ .Context }} "
+                },
+                {
+                    "type": "kubectl",
+                    "style": "powerline",
+                    "powerline_symbol": "",
+                    "background": "#326ce5",
+                    "foreground": "#cba6f7",
+                    "template": "{{ if .Env.K8S_ACTIVE }} 󱃾 {{ .Context }}{{ if .Namespace }}:{{ .Namespace }}{{ end }} {{ end }}"
+                }
+            ]
+        },
+        {
+            "type": "prompt",
+            "alignment": "right",
+            "segments": [
+                {
+                    "type": "executiontime",
+                    "style": "diamond",
+                    "leading_diamond": "",
+                    "trailing_diamond": "",
+                    "background": "#44475a",
+                    "foreground": "#f9e2af",
+                    "properties": {
+                        "threshold": 500
+                    },
+                    "template": " {{ mulf .Ms 0.001 | printf \"%.1f\" }}s "
+                }
+            ]
+        },
+        {
+            "type": "prompt",
+            "alignment": "left",
+            "newline": true,
+            "segments": [
+                {
+                    "type": "text",
+                    "style": "plain",
+                    "foreground": "#ff79c6",
+                    "template": "❯ "
+                }
+            ]
+        }
+    ]
+}

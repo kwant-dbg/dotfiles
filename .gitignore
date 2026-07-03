@@ -1,10 +1,40 @@
-# Never commit secrets
-.zshrc.local
+# Secrets and local overrides
+.env
+.env.*
+!.env.example
 *.local
 *.pem
 *.key
 id_ed25519
 id_ed25519_personal
-.env
 credentials
 hypr/wallpaper.jpg
+*.p12
+*.pfx
+*credential*
+*credentials*
+*secret*
+*token*
+auth.json
+.zshrc.local
+
+# Runtime state
+*.log
+*.sqlite*
+*.db
+*.history
+*.history.*
+history.jsonl
+sessions/
+transcripts/
+cache/
+logs/
+node_modules/
+backups/
+.nvimlog
+.DS_Store
+
+# This repo intentionally versions its agent instruction files.
+!claude/CLAUDE.md
+!codex/AGENTS.md
+!gemini/GEMINI.md

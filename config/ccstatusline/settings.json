@@ -1,0 +1,64 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "24e15398-66cd-46a8-b11a-294d8dfc535e",
+        "type": "vim-mode",
+        "color": "brightRed"
+      },
+      {
+        "id": "1",
+        "type": "model",
+        "color": "yellow"
+      },
+      {
+        "id": "3",
+        "type": "context-bar",
+        "color": "brightBlue"
+      },
+      {
+        "id": "8b1c5cc9-762f-483c-a7e7-2d00ae71ca0e",
+        "type": "thinking-effort",
+        "color": "brightBlack"
+      },
+      {
+        "id": "ecef362b-c187-446a-a809-f35c03384b19",
+        "type": "flex-separator"
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "color": "brightGreen"
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "color": "brightGreen"
+      }
+    ],
+    [],
+    []
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 2,
+  "inheritSeparatorColors": true,
+  "globalBold": true,
+  "minimalistMode": true,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": true,
+    "continueThemeAcrossLines": true,
+    "theme": "nord-aurora"
+  },
+  "defaultPadding": " "
+}

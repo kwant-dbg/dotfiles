@@ -1,0 +1,4 @@
+{
+  "/home/trip/yum": "TRUST_FOLDER",
+  "/home/trip": "DO_NOT_TRUST"
+}

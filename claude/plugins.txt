@@ -1,0 +1,8 @@
+# Declarative record only; reinstall through Claude Code rather than copying its cache.
+caveman@caveman
+claude-code-setup@claude-plugins-official
+gopls-lsp@claude-plugins-official
+
+# Marketplaces
+caveman
+claude-plugins-official
