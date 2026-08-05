@@ -30,7 +30,7 @@ GREEN=$'\033[38;5;114m'  # Soft green
 RESET=$'\033[0m'
 
 # Shorten path (~, not /home/user)
-full_path="${cwd/#$HOME/\~}"
+full_path="${cwd/#$HOME/~}"
 
 # Get git info for right-aligned block
 git_right=""
@@ -43,8 +43,9 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
 
     # Diff insertions/deletions summary (staged changes)
     diff_stat=$(git -C "$cwd" diff --cached --shortstat 2>/dev/null)
-    ins=$(echo "$diff_stat" | grep -oP '\d+(?= insertion)' || echo "")
-    del=$(echo "$diff_stat" | grep -oP '\d+(?= deletion)' || echo "")
+    # BSD sed compatible (no grep -P on macOS)
+    ins=$(sed -n 's/.*[^0-9]\([0-9][0-9]*\) insertion.*/\1/p' <<<"$diff_stat")
+    del=$(sed -n 's/.*[^0-9]\([0-9][0-9]*\) deletion.*/\1/p' <<<"$diff_stat")
 
     diff_info=""
     [ -n "$ins" ] && diff_info="${GREEN}+${ins}${RESET}"
@@ -103,11 +104,18 @@ model_short="${model#Claude }"
 if [[ "$model_short" =~ application-inference-profile/([a-z0-9]+) ]]; then
     # Extract just the profile ID from the ARN
     model_short="bedrock:${BASH_REMATCH[1]:0:8}"
+# Handle LiteLLM aliases, e.g. "opus (bedrock)[1m]" -> "Opus [1m]"
+elif [[ "$model_short" =~ ^(opus|sonnet|haiku)[[:space:]]*\(bedrock\)(.*)$ ]]; then
+    tier="${BASH_REMATCH[1]}"
+    suffix="${BASH_REMATCH[2]}"
+    model_short="${tier:0:1}"
+    model_short="$(tr '[:lower:]' '[:upper:]' <<<"$model_short")${tier:1}"
+    [ -n "$suffix" ] && model_short="$model_short $suffix"
 # Handle standard Claude model names
 elif [[ "$model_short" =~ ^Opus[[:space:]]+([0-9.]+) ]]; then
     model_short="Opus ${BASH_REMATCH[1]} "
 elif [[ "$model_short" =~ ^Sonnet[[:space:]]+([0-9.]+) ]]; then
-    model_short="Sonnet ${BASH_REMATCH[1] }"
+    model_short="Sonnet ${BASH_REMATCH[1]}"
 elif [[ "$model_short" =~ ^Haiku[[:space:]]+([0-9.]+) ]]; then
     model_short="Haiku ${BASH_REMATCH[1]} "
 
