@@ -38,7 +38,7 @@ setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=''
 plugins=(git zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
-source "$ZSH/oh-my-zsh.sh"
+[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
