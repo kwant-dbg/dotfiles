@@ -1,17 +1,26 @@
 #!/bin/bash
 
-# Read JSON input from stdin once, extract all fields
+# Read JSON input from stdin once, extract all fields in a single jq call
+# (bash 3.2 on macOS has no mapfile/readarray, so join on a separator + `read`)
 input=$(cat)
-cwd=$(jq -r '.workspace.current_dir' <<<"$input")
-model=$(jq -r '.model.display_name' <<<"$input")
-output_style=$(jq -r '.output_style.name // empty' <<<"$input")
-context_remaining=$(jq -r '.context_window.remaining_percentage // empty' <<<"$input")
-context_size=$(jq -r '.context_window.context_window_size // empty' <<<"$input")
-agent_name=$(jq -r '.agent.name // empty' <<<"$input")
-total_cost_usd=$(jq -r '.cost.total_cost_usd // empty' <<<"$input")
-total_input=$(jq -r '.context_window.total_input_tokens // 0' <<<"$input")
-total_output=$(jq -r '.context_window.total_output_tokens // 0' <<<"$input")
-duration_ms=$(jq -r '.cost.total_duration_ms // 0' <<<"$input")
+SEP=$'\x1e'
+IFS="$SEP" read -r cwd model output_style context_remaining context_size \
+    agent_name total_cost_usd total_input total_output duration_ms <<<"$(
+    jq -j --arg sep "$SEP" '
+        [
+            .workspace.current_dir,
+            .model.display_name,
+            (.output_style.name // ""),
+            (.context_window.remaining_percentage // ""),
+            (.context_window.context_window_size // ""),
+            (.agent.name // ""),
+            (.cost.total_cost_usd // ""),
+            (.context_window.total_input_tokens // 0),
+            (.context_window.total_output_tokens // 0),
+            (.cost.total_duration_ms // 0)
+        ] | map(tostring) | join($sep)
+    ' <<<"$input"
+)"
 
 # OS icon (matches oh-my-posh config: WSL = 🐧)
 # os_icon="🐧"
@@ -29,42 +38,65 @@ RED=$'\033[38;5;203m'    # Soft red
 GREEN=$'\033[38;5;114m'  # Soft green
 RESET=$'\033[0m'
 
-# Shorten path (~, not /home/user)
-full_path="${cwd/#$HOME/~}"
+# Shorten path to last 2 directory segments (home dir shown as ~; "..." marks pruned depth)
+if [ "$cwd" = "$HOME" ]; then
+    full_path="~"
+else
+    full_path=$(echo "$cwd" | awk -F/ '{depth=NF-1; if (depth>2) print ".../"$(NF-1)"/"$NF; else print $0}')
+fi
 
 # Get git info for right-aligned block
 git_right=""
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
-    git_branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "detached")
+    # --show-current exits 0 with empty output on detached HEAD, so test the value not the status
+    git_branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
+    [ -z "$git_branch" ] && git_branch="detached@$(git -C "$cwd" rev-parse --short HEAD 2>/dev/null)"
 
-    # Staged and unstaged counts
+    # Staged and unstaged file counts
     staged=$(git -C "$cwd" diff --cached --numstat 2>/dev/null | wc -l | tr -d ' ')
     unstaged=$(git -C "$cwd" diff --numstat 2>/dev/null | wc -l | tr -d ' ')
+    untracked=$(git -C "$cwd" ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
 
-    # Diff insertions/deletions summary (staged changes)
-    diff_stat=$(git -C "$cwd" diff --cached --shortstat 2>/dev/null)
+    # Insertions/deletions across the whole working tree (staged + unstaged) vs HEAD,
+    # so the counters match what the dirty marker implies.
+    diff_stat=$(git -C "$cwd" diff HEAD --shortstat 2>/dev/null)
     # BSD sed compatible (no grep -P on macOS)
     ins=$(sed -n 's/.*[^0-9]\([0-9][0-9]*\) insertion.*/\1/p' <<<"$diff_stat")
     del=$(sed -n 's/.*[^0-9]\([0-9][0-9]*\) deletion.*/\1/p' <<<"$diff_stat")
 
     diff_info=""
     [ -n "$ins" ] && diff_info="${GREEN}+${ins}${RESET}"
-    [ -n "$del" ] && diff_info="$diff_info ${RED}-${del}${RESET}"
+    [ -n "$del" ] && diff_info="${diff_info:+$diff_info }${RED}-${del}${RESET}"
 
     status_icon=""
     [ "$staged" -gt 0 ] 2>/dev/null && status_icon="${YELLOW}●${RESET} "
     [ "$unstaged" -gt 0 ] 2>/dev/null && status_icon="${status_icon}${RED}✎${RESET} "
 
+    # Ahead/behind upstream (silently skipped when no upstream is configured)
+    track_info=""
+    if ab=$(git -C "$cwd" rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null); then
+        behind=$(awk '{print $1}' <<<"$ab")
+        ahead=$(awk '{print $2}' <<<"$ab")
+        [ "${ahead:-0}" -gt 0 ] 2>/dev/null && track_info="${GREEN}↑${ahead}${RESET}"
+        [ "${behind:-0}" -gt 0 ] 2>/dev/null && track_info="${track_info:+$track_info}${YELLOW}↓${behind}${RESET}"
+    fi
+
     git_right="${status_icon}${CYAN}${git_branch}${RESET}"
+    [ -n "$track_info" ] && git_right="$git_right $track_info"
+    [ "${untracked:-0}" -gt 0 ] 2>/dev/null && git_right="$git_right ${GRAY}?${untracked}${RESET}"
     [ -n "$diff_info" ] && git_right="$git_right $diff_info"
 fi
 
-# Docker context (only show if docker is available and working)
+# Docker context (only show if docker is available and the daemon is actually reachable)
 docker_info=""
 if command -v docker >/dev/null 2>&1; then
     docker_context=$(docker context show 2>/dev/null)
-    if [ $? -eq 0 ] && [ -n "$docker_context" ] && [ "$docker_context" != "default" ]; then
-        docker_info="docker:$docker_context "
+    if [ -n "$docker_context" ] && [ "$docker_context" != "default" ]; then
+        docker_endpoint=$(docker context inspect "$docker_context" --format '{{.Endpoints.docker.Host}}' 2>/dev/null)
+        docker_socket="${docker_endpoint#unix://}"
+        if [ -S "$docker_socket" ] && docker info >/dev/null 2>&1; then
+            docker_info="docker:$docker_context "
+        fi
     fi
 fi
 
@@ -111,6 +143,14 @@ elif [[ "$model_short" =~ ^(opus|sonnet|haiku)[[:space:]]*\(bedrock\)(.*)$ ]]; t
     model_short="${tier:0:1}"
     model_short="$(tr '[:lower:]' '[:upper:]' <<<"$model_short")${tier:1}"
     [ -n "$suffix" ] && model_short="$model_short $suffix"
+# Handle explicit LiteLLM model ids, e.g. "claude-sonnet-5 (claude-on-aws)[1m]" -> "Sonnet 5 [1m]"
+elif [[ "$model_short" =~ ^claude-(opus|sonnet|haiku)-([0-9]+(-[0-9]+)*)[[:space:]]*"("[^\)]*")"(.*)$ ]]; then
+    tier="${BASH_REMATCH[1]}"
+    version="${BASH_REMATCH[2]//-/.}"
+    suffix="${BASH_REMATCH[4]}"
+    model_short="${tier:0:1}"
+    model_short="$(tr '[:lower:]' '[:upper:]' <<<"$model_short")${tier:1} $version"
+    [ -n "$suffix" ] && model_short="$model_short $suffix"
 # Handle standard Claude model names
 elif [[ "$model_short" =~ ^Opus[[:space:]]+([0-9.]+) ]]; then
     model_short="Opus ${BASH_REMATCH[1]} "
@@ -134,12 +174,12 @@ if [ -n "$context_remaining" ] && [ -n "$context_size" ] && [ "$context_size" !=
     else
         bar_color="$RED"
     fi
-    # Build 10-char block bar (filled = used, empty = remaining)
+    # Build 10-char block bar (filled = used, empty = remaining); guard filled/empty=0 (BSD seq needs >=1 args)
     filled=$(awk "BEGIN {printf \"%d\", int((1 - $context_remaining/100) * 10 + 0.5)}")
     empty=$((10 - filled))
     bar=""
-    for ((i=0; i<filled; i++)); do bar="${bar}▓"; done
-    for ((i=0; i<empty; i++)); do bar="${bar}░"; done
+    [ "$filled" -gt 0 ] && bar=$(printf '▓%.0s' $(seq 1 "$filled"))
+    [ "$empty" -gt 0 ] && bar="${bar}$(printf '░%.0s' $(seq 1 "$empty"))"
     output="$output ${bar_color}${bar}${RESET} ${bar_color}${used_k}k/${total_k}k${RESET} "
 fi
 
@@ -154,11 +194,19 @@ if [ -n "$agent_name" ]; then
 fi
 
 # ── Cost ──────────────────────────────────────────────
+# Prefer the harness-reported cost; only estimate when it is absent.
+# Fallback rates (USD per Mtok in/out) are picked from the model tier so the
+# estimate isn't ~5x off when running Opus.
 cost_str=""
 if [ -n "$total_cost_usd" ] && [ "$total_cost_usd" != "null" ]; then
     cost_str=$(printf "\$%.4f" "$total_cost_usd")
 elif [ "$total_input" -gt 0 ] || [ "$total_output" -gt 0 ]; then
-    total_cost=$(echo "scale=6; ($total_input * 3.00 + $total_output * 15.00) / 1000000" | bc -l 2>/dev/null || echo "0")
+    case "$(tr '[:upper:]' '[:lower:]' <<<"$model_short")" in
+        *opus*)  rate_in=15.00; rate_out=75.00 ;;
+        *haiku*) rate_in=1.00;  rate_out=5.00  ;;
+        *)       rate_in=3.00;  rate_out=15.00 ;;  # sonnet / unknown
+    esac
+    total_cost=$(echo "scale=6; ($total_input * $rate_in + $total_output * $rate_out) / 1000000" | bc -l 2>/dev/null || echo "0")
     cost_str=$(printf "\$%.4f" "$total_cost")
 fi
 
@@ -188,9 +236,11 @@ fi
 
 # Right-align git info if in a git repo
 if [ -n "$git_right" ]; then
-    # Strip ANSI codes to measure visible lengths
-    visible_left=$(echo -e "$output" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\n' | wc -c)
-    visible_right=$(echo -e "$git_right" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\n' | wc -c)
+    # Strip ANSI codes to measure visible lengths.
+    # wc -m (chars) not -c (bytes): the bar/status glyphs are 3-byte UTF-8, which
+    # would otherwise overcount the width by ~2 cols each and wrap the line.
+    visible_left=$(echo -e "$output" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\n' | wc -m)
+    visible_right=$(echo -e "$git_right" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\n' | wc -m)
     term_width=$(tput cols 2>/dev/null || echo 120)
     padding=$((term_width - visible_left - visible_right - 1))
     [ $padding -lt 1 ] && padding=1

@@ -24,16 +24,9 @@ hide_window_decorations no
 confirm_os_window_close 0
 
 # Tab bar
-tab_bar_style separator
-tab_separator " │ "
+tab_bar_style powerline
+tab_powerline_style slanted
 tab_bar_min_tabs 2
-tab_bar_background #161617
-active_tab_foreground #161617
-active_tab_background #aca1cf
-active_tab_font_style bold
-inactive_tab_foreground #92909a
-inactive_tab_background #1b1b1d
-inactive_tab_font_style normal
 
 # Mellow dark theme
 foreground            #c9c7cd

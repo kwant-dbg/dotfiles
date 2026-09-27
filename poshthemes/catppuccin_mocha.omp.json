@@ -18,16 +18,11 @@
           "type": "os"
         },
         {
-          "foreground": "p:blue",
-          "style": "plain",
-          "template": "{{ .UserName }} ",
-          "type": "session"
-        },
-        {
           "foreground": "p:pink",
           "options": {
             "folder_icon": "..\ue5fe..",
             "home_icon": "~",
+            "max_depth": 2,
             "style": "agnoster_short"
           },
           "style": "plain",

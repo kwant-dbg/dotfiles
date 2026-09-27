@@ -1,63 +1,63 @@
 # ~/.zshrc
+#line cursor
+# printf '\e[6 q'
 
-# Interactive check
-[[ $- != *i* ]] && return
+# Only continue for interactive shells.
+[[ $- == *i* ]] || return
+# Environment
+typeset -U path PATH
+path=(
+  "$HOME/.local/bin"
+  $path
+)
 
-# ─────────────────────────────────────────────────────────────
-# Environment & Path
-# ─────────────────────────────────────────────────────────────
-# Consolidated paths for efficiency
-
-eval "$(zoxide init zsh --cmd cd)"
-
-export PATH="$HOME/.local/bin:/home/trip/.opencode/bin:/snap/bin:$PATH"
-export PATH="$HOME/.config/emacs/bin:$PATH"
-
-# Go installation
-export GOROOT="$HOME/go-installation/go"
-export PATH="$GOROOT/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"  # For installed Go tools
-
-export EDITOR="nvim"
-export VISUAL="nvim"
-export BAT_PAGER=""             # Force bat/cat to stay inline globally
-export BAT_THEME="trip-catppuccin"
-export EZA_COLORS="di=38;2;245;194;231:ex=38;2;148;226;213:ln=38;2;180;190;254:or=38;2;243;139;168:*.go=38;2;148;226;213:*.lua=38;2;137;180;250:*.md=38;2;180;190;254:*.json=38;2;250;179;135:*.yaml=38;2;203;166;247:*.yml=38;2;203;166;247:*.toml=38;2;245;194;231:*.sh=38;2;148;226;213:*.Dockerfile=38;2;116;199;236:Dockerfile=38;2;116;199;236"
+export EDITOR=nvim
+export VISUAL=$EDITOR
+export BAT_PAGER=''
+export EZA_COLORS='di=38;2;245;194;231:ex=38;2;148;226;213:ln=38;2;180;190;254:or=38;2;243;139;168:*.go=38;2;148;226;213:*.lua=38;2;137;180;250:*.md=38;2;180;190;254:*.json=38;2;250;179;135:*.yaml=38;2;203;166;247:*.yml=38;2;203;166;247:*.toml=38;2;245;194;231:*.sh=38;2;148;226;213:*.Dockerfile=38;2;116;199;236:Dockerfile=38;2;116;199;236'
 
 # Claude Code via Yum LiteLLM
-export ANTHROPIC_BASE_URL="https://litellm.shd.yumconnect.dev"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="haiku (bedrock)"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="sonnet (bedrock)"
-export ANTHROPIC_DEFAULT_OPUS_MODEL="opus (bedrock)"
-export CLAUDE_CODE_USE_BEDROCK="0"
-export CLAUDE_CODE_API_KEY_HELPER_TTL_MS="21600000"
+export ANTHROPIC_BASE_URL='https://litellm.shd.yumconnect.dev'
+export ANTHROPIC_DEFAULT_HAIKU_MODEL='haiku (bedrock)'
+export ANTHROPIC_DEFAULT_SONNET_MODEL='sonnet (bedrock)'
+export ANTHROPIC_DEFAULT_OPUS_MODEL='opus (bedrock)'
+export CLAUDE_CODE_USE_BEDROCK=0
+export CLAUDE_CODE_API_KEY_HELPER_TTL_MS=21600000
 unset ANTHROPIC_MODEL
 
-# Tmux persistent socket directory
 export TMUX_TMPDIR="$HOME/.tmux/tmp"
+export DOOMDIR="$HOME/.config/doom"
+export EMACSDIR="$HOME/.config/emacs"
+export AWS_CLI_AUTO_PROMPT=on-partial
 
-# ─────────────────────────────────────────────────────────────
-# Shell Options
-# ─────────────────────────────────────────────────────────────
+# Shell options
 unsetopt BEEP HIST_BEEP LIST_BEEP
 setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
 
-# ─────────────────────────────────────────────────────────────
-# Plugins & Completion
-# ─────────────────────────────────────────────────────────────
-autoload -Uz compinit && compinit
+# Plugins and completion
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=''
+plugins=(git zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
+source "$ZSH/oh-my-zsh.sh"
+
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
-# Load plugins with silent error handling
-source $HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
-source $HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2>/dev/null
+# Optional tools
+if (( $+commands[zoxide] )); then
+  eval "$(zoxide init zsh --cmd cd)"
+fi
 
-# ─────────────────────────────────────────────────────────────
+if (( $+commands[atuin] )); then
+  eval "$(atuin init zsh)"
+fi
+
+if (( $+commands[starship] )); then
+  eval "$(starship init zsh)"
+fi
+
 # Aliases
-# ─────────────────────────────────────────────────────────────
-alias ls='eza --icons --group-directories-first'
-alias cat='bat --paging=never --style=grid,header'   # Keeps file separators without line numbers
+alias cat='bat --paging=never --style=grid,header'
 alias grep='grep --color=auto'
 alias c='clear'
 alias ..='cd ..'
@@ -68,44 +68,40 @@ alias koff='unset K8S_ACTIVE'
 alias n='nvim'
 alias cc='claude'
 alias oc='opencode'
+alias eza='eza --icons=always'
+alias ls='eza --icons=always --group-directories-first'
+alias g++='g++-16'
+alias gcc='gcc-16'
 
-# ─────────────────────────────────────────────────────────────
-# Functions
-# ─────────────────────────────────────────────────────────────
-# Yazi with directory change on exit
-function y() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+# Change to the directory selected in Yazi when it exits.
+if (( $+commands[yazi] )); then
+  y() {
+    local tmp cwd
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
     yazi "$@" --cwd-file="$tmp"
-    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-        builtin cd -- "$cwd"
+    if cwd="$(command cat -- "$tmp")" && [[ -n $cwd && $cwd != "$PWD" ]]; then
+      builtin cd -- "$cwd"
     fi
     rm -f -- "$tmp"
-}
+  }
+fi
 
-# NVM Lazy Loader: Speeds up shell startup by loading Node only when needed
-function nvm() {
-    unset -f nvm node npm npx gemini codex > /dev/null 2>&1;
+# Load Node.js only when its commands are first used.
+if [[ -s $HOME/.nvm/nvm.sh ]]; then
+  nvm() {
+    unset -f nvm node npm npx gemini codex
     export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    source "$NVM_DIR/nvm.sh"
+    [[ -s $NVM_DIR/bash_completion ]] && source "$NVM_DIR/bash_completion"
     nvm "$@"
-}
-function node() { nvm >/dev/null; command node "$@"; }
-function npm() { nvm >/dev/null; command npm "$@"; }
-function gemini() { nvm >/dev/null; command gemini "$@"; }
-function npx() { nvm >/dev/null; command npx "$@"; }
+  }
+  node() { nvm >/dev/null && command node "$@"; }
+  npm() { nvm >/dev/null && command npm "$@"; }
+  npx() { nvm >/dev/null && command npx "$@"; }
+  gemini() { nvm >/dev/null && command gemini "$@"; }
+fi
 
-
-# ─────────────────────────────────────────────────────────────
-# Prompt & External Tools
-# ─────────────────────────────────────────────────────────────
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/catppuccin_mocha.omp.json)"
-
-# Atuin - Better Shell History
-. "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
-
-# Key Bindings
+# Key bindings
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
 bindkey '^[[H' beginning-of-line
@@ -115,30 +111,18 @@ bindkey '^U' backward-kill-line
 bindkey '^K' kill-line
 bindkey '^W' backward-kill-word
 
-# ─────────────────────────────────────────────────────────────
-# Terminal Tab Title (enables icon swap in Windsurf for 'claude' tabs)
-# ─────────────────────────────────────────────────────────────
-function _set_tab_title() {
-    local title="${1:-zsh}"
-    # VSCode / Windsurf integrated terminal
-    printf '\e]0;%s\a' "$title"
+# Show the current command in the terminal tab title.
+_set_tab_title() {
+  printf '\e]0;%s\a' "${1:-zsh}"
 }
 
-function preexec() {
-    # Extract just the command name (first word), strip args
-    _set_tab_title "${1%% *}"
+preexec() {
+  _set_tab_title "${1%% *}"
 }
 
-function precmd() {
-    _set_tab_title "zsh"
+precmd() {
+  _set_tab_title zsh
 }
-export DOOMDIR="$HOME/.config/doom"
-export EMACSDIR="$HOME/.config/emacs"
-export DISPLAY=:0
-export PATH="$HOME/.npm-global/bin:$PATH"
-export AWS_CLI_AUTO_PROMPT=on-partial
 
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-
-  export PATH="${PATH}:/home/trip/.cargo/bin"
+# Generated by envman.
+[[ -s $HOME/.config/envman/load.sh ]] && source "$HOME/.config/envman/load.sh"

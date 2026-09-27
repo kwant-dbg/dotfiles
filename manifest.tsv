@@ -58,9 +58,7 @@ claude/CLAUDE.md	.claude/CLAUDE.md
 claude/keybindings.json	.claude/keybindings.json
 claude/settings.json	.claude/settings.json	template
 claude/statusline.sh	.claude/statusline.sh
-claude/skills-lock.json	.claude/skills-lock.json
 claude/skills	.claude/skills
-claude/dot-agents/skills	.claude/.agents/skills
 codex/AGENTS.md	.codex/AGENTS.md
 codex/config.toml	.codex/config.toml	template
 codex/hooks.json	.codex/hooks.json
