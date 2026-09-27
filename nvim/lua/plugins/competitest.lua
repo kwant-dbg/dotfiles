@@ -13,7 +13,9 @@ local function in_cf()
   local cwd = vim.fs.normalize(vim.fn.getcwd())
   return cwd == cf_root or vim.startswith(cwd, cf_root .. '/')
 end
-vim.fn.mkdir(cf_bin, 'p')
+if in_cf() then
+  vim.fn.mkdir(cf_bin, 'p')
+end
 
 local debug_header = vim.api.nvim_get_runtime_file('debug.h', false)[1]
 local cpp_args = {
@@ -79,7 +81,7 @@ require('competitest').setup({
   start_receiving_persistently_on_setup = in_cf(),
   compile_command = {
     cpp = {
-      exec = '/opt/homebrew/bin/g++-16',
+      exec = vim.fn.executable('/opt/homebrew/bin/g++-16') == 1 and '/opt/homebrew/bin/g++-16' or 'g++',
       args = cpp_args,
     },
   },
